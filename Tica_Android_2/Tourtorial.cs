@@ -18,7 +18,6 @@ namespace Tica_Android_2
 		public Strelice livo;
 
 		Texture2D ruka_green;
-		Texture2D ruka_off;
 		Texture2D strel_d_g;
 		Texture2D strel_d_d;
 		Texture2D strel_l;
@@ -26,13 +25,10 @@ namespace Tica_Android_2
 		bool ruka_na_poziciji;
 		private float scale;
 
-		private Vector2[] tocke_odr;
-		private Vector2[] tocke_ish;
 
 		public void LoadContent(ContentManager cm )
 		{
 			ruka_green = cm.Load<Texture2D> ("Tourtorial/ruka_green");
-			ruka_off = cm.Load<Texture2D> ("Tourtorial/ruka_blank");
 			strel_l = cm.Load<Texture2D> ("Tourtorial/green_left");
 			strel_d_d= cm.Load<Texture2D> ("Tourtorial/red_down");
 			strel_d_g=cm.Load<Texture2D> ("Tourtorial/red_up");
@@ -44,6 +40,7 @@ namespace Tica_Android_2
 		}
 		public void Postavi_varijable(float scal)
 		{
+
 			stanje="livo";
 			livo = new Strelice (scal, 200, 200,90, 200, strel_l);
 			desno_doli = new Strelice (scal, 225, 225, 340, 340,strel_d_d);
