@@ -16,8 +16,6 @@
     <AssemblyName>Tica_Android_2</AssemblyName>
     <TargetFrameworkVersion>v4.2</TargetFrameworkVersion>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,6 +28,7 @@
     <ConsolePause>false</ConsolePause>
     <AndroidLinkMode>None</AndroidLinkMode>
     <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
+    <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -61,12 +60,16 @@
     <Reference Include="Xamarin.Android.Support.v7.MediaRouter">
       <HintPath>..\packages\Xamarin.Android.Support.v7.MediaRouter.21.0.3.0\lib\MonoAndroid403\Xamarin.Android.Support.v7.MediaRouter.dll</HintPath>
     </Reference>
+    <Reference Include="GooglePlayServicesLib">
+      <HintPath>..\packages\Xamarin.GooglePlayServices.22.0.0.2\lib\MonoAndroid41\GooglePlayServicesLib.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages\MonoGame.Framework.dll" />
     <None Include="packages\Lidgren.Network.dll" />
     <None Include="Resources\AboutResources.txt" />
     <None Include="Properties\AndroidManifest.xml" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Activity1.cs" />
@@ -85,6 +88,8 @@
     <Compile Include="MuteBotun.cs" />
     <Compile Include="HealthBar.cs" />
     <Compile Include="Strelice.cs" />
+    <Compile Include="AdListener.cs" />
+    <Compile Include="AdWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\Icon.png" />
@@ -146,7 +151,6 @@
     <AndroidAsset Include="Assets\Content\Tice\tica_stit2.png" />
     <AndroidAsset Include="Assets\Content\Tice\tica_stit3.png" />
     <AndroidAsset Include="Assets\Content\Shop\check.png" />
-    <AndroidAsset Include="Assets\Content\Shop\lock.jpg" />
     <AndroidAsset Include="Assets\Content\HighScore\fc.png" />
     <AndroidAsset Include="Assets\Content\HighScore\hs_bg.png" />
     <AndroidAsset Include="Assets\Content\HighScore\tica0.png" />
@@ -164,6 +168,8 @@
     <AndroidAsset Include="Assets\Content\Tourtorial\red_down.png" />
     <AndroidAsset Include="Assets\Content\Tourtorial\red_up.png" />
     <AndroidAsset Include="Assets\Content\Tourtorial\ruka_green.png" />
+    <AndroidAsset Include="Assets\Content\Shop\lock.png" />
+    <AndroidAsset Include="Assets\Content\Shop\scroll.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup>

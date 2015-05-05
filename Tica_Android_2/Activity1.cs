@@ -8,6 +8,7 @@ using Android.Widget;
 using Android.OS;
 using Android.Content.PM;
 using Microsoft.Xna.Framework;
+using Android.Gms.Ads;
 
 namespace Tica_Android_2
 {
@@ -28,6 +29,7 @@ namespace Tica_Android_2
 			// Create our OpenGL view, and display it
 			var g = new Game1 ();
 			SetContentView (g.Services.GetService<View> ());
+			g.context = this;
 			g.Run ();
 		}
 		

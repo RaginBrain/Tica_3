@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Content;
 
 namespace Tica_Android_2
 {
@@ -15,14 +16,23 @@ namespace Tica_Android_2
 		int selected_skin;
 		Texture2D Lock;
 		Texture2D Check_sign;
-		Rectangle pozicija_dodira;
+		Sprite scroll;
+		public Score ispis_brojeva;
 
 
-		public Shop (Skin_button[] B, Texture2D l,Texture2D c,int selected,string unlocked_b)
+
+		public Shop (int selected,string unlocked_b,ContentManager cm,float scale,int sirina, List<Texture2D> znamenke )
 		{
-			Check_sign = c;
-			Lock = l;
-			Bird_select_button = B;
+			ispis_brojeva = new Score (znamenke);
+			scroll = new Sprite (new Rectangle((int)(sirina/2 - 255*scale),(int)(100*scale),(int)(550*scale),(int)(250*scale)),cm.Load<Texture2D>("Shop/scroll"));
+			Lock =cm.Load<Texture2D> ("Shop/lock");
+			Check_sign = cm.Load<Texture2D> ("Shop/check");
+			Bird_select_button = new Skin_button[4];
+
+			Bird_select_button [0] = new Skin_button (new Rectangle ((int)(sirina/2 - 205*scale), (int)(150 * scale), (int)(100 * scale), (int)(100 * scale)),cm.Load<Texture2D> ("Shop/tica_0"),0);
+			Bird_select_button [1] = new Skin_button (new Rectangle ((int)(sirina/2 - 100*scale), (int)(150 * scale), (int)(100 * scale), (int)(100 * scale)),cm.Load<Texture2D> ("Shop/tica_1"),0);
+			Bird_select_button [2] = new Skin_button (new Rectangle ((int)(sirina/2 +5*scale), (int)(150 * scale), (int)(100 * scale), (int)(100 * scale)),cm.Load<Texture2D> ("Shop/tica_2"),0 );
+			Bird_select_button [3] = new Skin_button (new Rectangle ((int)(sirina/2 +105*scale), (int)(150* scale), (int)(100 * scale), (int)(100 * scale)), cm.Load<Texture2D> ("Shop/tica_3"),0);
 			selected_skin = selected;
 			for (int i = 0; i < 3; i++)
 			{
@@ -32,7 +42,6 @@ namespace Tica_Android_2
 					Bird_select_button [i + 1].locked = false;
 					
 			}
-
 		}
 
 		public void Locked_Birds(ref string locked_birds)
@@ -72,8 +81,9 @@ namespace Tica_Android_2
 				}
 		}
 
-		public void Draw(SpriteBatch spriteBatch)
+		public void Draw(SpriteBatch spriteBatch,float scale)
 		{
+			scroll.Draw (spriteBatch);
 
 			for (int i = 0; i < 4; i++) {
 				
@@ -84,6 +94,7 @@ namespace Tica_Android_2
 					spriteBatch.Draw (Check_sign, Bird_select_button [i].rectangle, Color.White);
 				
 			}
+			ispis_brojeva.Draw (spriteBatch, (int)(300*scale),(int)(280*scale),(int)(20*scale), (int)(50*scale));
 		}
 	}
 }

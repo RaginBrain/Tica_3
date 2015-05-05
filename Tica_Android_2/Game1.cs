@@ -11,6 +11,8 @@ using System.IO;
 using System.IO.IsolatedStorage;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
+using Android.Content;
+using Android.Gms.Ads;
 
 #endregion
 
@@ -22,7 +24,9 @@ namespace Tica_Android_2
 	/// </summary>
 	public class Game1 : Microsoft.Xna.Framework.Game
 	{	
-
+		public bool napravljeni;
+		public int add_counter;
+		public Context context;
 		HealthBar akceleracija_bar;
 		Sprite Score_scroll;
 		Sprite repeat_button;
@@ -32,10 +36,8 @@ namespace Tica_Android_2
 		bool mute_on;
 
 		Shop game_shop;
-		Texture2D lokot;
-		Texture2D check;
+
 		int racun;
-		Skin_button[] Bird_select_button;
 		Score rezultat;
 		Score ispis_brojeva;
 
@@ -154,6 +156,8 @@ namespace Tica_Android_2
 
 		public Game1()
 		{
+			
+
 
 			graphics = new GraphicsDeviceManager(this);
 
@@ -162,7 +166,8 @@ namespace Tica_Android_2
 
 			sirina = graphics.PreferredBackBufferWidth;
 			visina = graphics.PreferredBackBufferHeight;
-
+			add_counter = 0;
+			napravljeni = false;
 			scale = ((float)(((float)visina / 480f) + ((float)sirina / 800f)) / 2f);
 			Content.RootDirectory = "Content";
 
@@ -203,6 +208,7 @@ namespace Tica_Android_2
 		protected override void Initialize()
 		{
 			// TODO: Add your initialization logic here
+
 
 			base.Initialize();
 			player1.Initialize();
@@ -288,16 +294,7 @@ namespace Tica_Android_2
 
 		
 
-			Bird_select_button = new Skin_button[4];
-			Bird_select_button [0] = new Skin_button (new Rectangle ((int)(sirina/2 - 205*scale), (int)(150 * scale), (int)(100 * scale), (int)(100 * scale)),Content.Load<Texture2D> ("Shop/tica_0"),0);
-			Bird_select_button [1] = new Skin_button (new Rectangle ((int)(sirina/2 - 100*scale), (int)(150 * scale), (int)(100 * scale), (int)(100 * scale)),Content.Load<Texture2D> ("Shop/tica_1"),0);
-			Bird_select_button [2] = new Skin_button (new Rectangle ((int)(sirina/2 +5*scale), (int)(150 * scale), (int)(100 * scale), (int)(100 * scale)),Content.Load<Texture2D> ("Shop/tica_2"),0 );
-			Bird_select_button [3] = new Skin_button (new Rectangle ((int)(sirina/2 +105*scale), (int)(150* scale), (int)(100 * scale), (int)(100 * scale)), Content.Load<Texture2D> ("Shop/tica_3"),0);
-
-			lokot =Content.Load<Texture2D> ("Shop/lock");
-			check = Content.Load<Texture2D> ("Shop/check");
-
-			game_shop = new Shop (Bird_select_button, lokot, check, selected_bird, unlocked_birds);
+		
 
 			player1 = new Player(base_skins,stit_skins,ranjena_skins, new Rectangle((visina-(int)(visina/4.35f))/2, (visina-(int)(visina/4.35f))/2,50, 50),scale,selected_bird);
 			player_textura = player1.texture;
@@ -311,8 +308,9 @@ namespace Tica_Android_2
 
 
 			rezultat = new Score (lista_txtr);
-			ispis_brojeva = new Score (lista_txtr);
 
+
+			game_shop = new Shop ( selected_bird, unlocked_birds,Content, scale, sirina,lista_txtr);
 			turtorial_tex = Content.Load<Texture2D> ("turtorial");
 			kruna=Content.Load<Texture2D>("kruna");
 
@@ -397,7 +395,7 @@ namespace Tica_Android_2
 			{	
 
 			case GameState.Start:
-				ispis_brojeva.Update(racun);
+				game_shop.ispis_brojeva.Update(racun);
 				rezultat.Update (high_score);
 				touchCollection = TouchPanel.GetState ();
 				Rectangle pozicija_dodira;
@@ -583,6 +581,7 @@ namespace Tica_Android_2
 					}
 					 else {
 						Save ();
+						add_counter+=2;
 						currentGameState = GameState.Score_show;
 					}
 				}
@@ -610,6 +609,19 @@ namespace Tica_Android_2
 
 
 			case GameState.Score_show:
+				
+				if (add_counter >= 5) {
+					
+					add_counter = -1;
+					sat.Reset();
+					sat.Start ();
+					var FinalAd = AdWrapper.ConstructFullPageAdd (context, "ca-app-pub-9649596465496350/6705151429");
+					var intlistener = new adlistener ();
+					napravljeni = true;
+					intlistener.AdLoaded += () => { if (FinalAd.IsLoaded && currentGameState==GameState.Score_show)FinalAd.Show(); };
+					FinalAd.AdListener = intlistener;
+					FinalAd.CustomBuild();
+				}
 
 				player1.Update (gameTime, visina, sirina, scale);
 				rezultat.Update (player1.score);
@@ -627,7 +639,7 @@ namespace Tica_Android_2
 					{
 						pozicija_dodira = new Rectangle ((int)tl.Position.X, (int)tl.Position.Y, 1, 1);
 
-						if (tl.State == TouchLocationState.Pressed && repeat_button.rectangle.Intersects (pozicija_dodira)) {
+						if (tl.State == TouchLocationState.Pressed && repeat_button.rectangle.Intersects (pozicija_dodira ) && (sat.Elapsed.Seconds>3 || add_counter!=-1)) {
 							Initialize ();
 							currentGameState = GameState.Ready;
 						}
@@ -635,10 +647,7 @@ namespace Tica_Android_2
 							Initialize ();
 
 						}
-
 					}
-
-
 				}
 				break;
 			}
@@ -667,7 +676,6 @@ namespace Tica_Android_2
 				spriteBatch.Draw(kruna,new Rectangle((sirina/2),((visina-visina/3)-(int)(65*scale)),(int)(90*scale),(int)(60*scale)),Color.White);
 				try{
 					rezultat.Draw (spriteBatch, sirina/2,visina-visina/3,(int)(30*scale), (int)(80*scale));
-					ispis_brojeva.Draw (spriteBatch, 0,visina-visina/3,(int)(20*scale), (int)(50*scale));
 
 				}
 				catch{}
@@ -693,7 +701,7 @@ namespace Tica_Android_2
 				scrolling1.Draw (spriteBatch);
 				scrolling2.Draw (spriteBatch);
 
-				game_shop.Draw (spriteBatch);
+				game_shop.Draw (spriteBatch,scale);
 
 				spriteBatch.Draw (back_button.texture, back_button.rectangle, Color.White);
 				spriteBatch.End ();
