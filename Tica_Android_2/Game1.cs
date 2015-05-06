@@ -146,7 +146,8 @@ namespace Tica_Android_2
 		Scrolling scrolling1;
 		Scrolling scrolling2;
 		Player player1;
-
+		public InterstitialAd FinalAd;
+		public adlistener intlistener;
 		List<Barijera> red_prepreka;
 
 
@@ -157,7 +158,7 @@ namespace Tica_Android_2
 		public Game1()
 		{
 			
-
+			 
 
 			graphics = new GraphicsDeviceManager(this);
 
@@ -324,8 +325,9 @@ namespace Tica_Android_2
 			game_over = new Sprite (new Rectangle (-visina, 0, (int)(300*scale), (int)(409*scale)),Content.Load<Texture2D>("game_over"));
 			repeat_button = new Sprite (new Rectangle ((int)(sirina - (120 * scale)),(int)(visina - (visina / 4.5f) - 80 * scale),  (int)(60 * scale), (int)(80 * scale)), Content.Load<Texture2D> ("Botuni/repeat_jaje"));
 			back_button = new Sprite (new Rectangle ((int)(60 * scale),(int)(visina - (visina / 4.5f) - 80 * scale),  (int)(60 * scale), (int)(80 * scale)), Content.Load<Texture2D> ("Botuni/nazad_jaje"));
-			mute_button = new MuteBotun (new Rectangle ((int)(200 * scale), (int)(visina - (visina / 6f)), (int)(50 * scale), (int)(50 * scale)),
-			Content.Load<Texture2D> ("Botuni/mute_on"), Content.Load<Texture2D> ("Botuni/mute_off"), mute_on);
+			mute_button = new MuteBotun (new Rectangle ((int)(30 * scale), (int)(visina - (visina / 4.5f)), (int)(45 * scale), (int)(55 * scale)),
+										Content.Load<Texture2D> ("Botuni/mute_on"), Content.Load<Texture2D> ("Botuni/mute_off"), mute_on);
+			
 			
 
 
@@ -395,15 +397,13 @@ namespace Tica_Android_2
 			{	
 
 			case GameState.Start:
-				game_shop.ispis_brojeva.Update(racun);
+				game_shop.ispis_brojeva.Update (racun);
 				rezultat.Update (high_score);
 				touchCollection = TouchPanel.GetState ();
 				Rectangle pozicija_dodira;
-				foreach (TouchLocation tl in touchCollection) 
-				{
+				foreach (TouchLocation tl in touchCollection) {
 
-					if ((tl.State == TouchLocationState.Pressed) || (tl.State == TouchLocationState.Moved)) 
-					{
+					if ((tl.State == TouchLocationState.Pressed) || (tl.State == TouchLocationState.Moved)) {
 						pozicija_dodira = new Rectangle ((int)tl.Position.X, (int)tl.Position.Y, 1, 1);
 
 						if (tl.State == TouchLocationState.Pressed && start_button.rectangle.Intersects (pozicija_dodira))
@@ -417,6 +417,7 @@ namespace Tica_Android_2
 						}
 					}
 				}
+
 				if (mute_on)
 					mute_button.selected_tex = mute_button.texture;
 				else
@@ -490,7 +491,11 @@ namespace Tica_Android_2
 				scrolling2.Update (scale);
 				//******************************************************************************
 
-
+				if (add_counter>=3 && add_counter!=6) {
+					FinalAd = AdWrapper.ConstructFullPageAdd (context, "ca-app-pub-9649596465496350/6705151429");
+					intlistener = new adlistener ();
+					add_counter = 6;
+				}
 			
 				for (int i = 0; i < test_lista_coina.Count; i++) {
 					if (test_lista_coina [i].rectangle.X < (-33 * scale))
@@ -615,8 +620,7 @@ namespace Tica_Android_2
 					add_counter = -1;
 					sat.Reset();
 					sat.Start ();
-					var FinalAd = AdWrapper.ConstructFullPageAdd (context, "ca-app-pub-9649596465496350/6705151429");
-					var intlistener = new adlistener ();
+
 					napravljeni = true;
 					intlistener.AdLoaded += () => { if (FinalAd.IsLoaded && currentGameState==GameState.Score_show)FinalAd.Show(); };
 					FinalAd.AdListener = intlistener;

@@ -170,6 +170,7 @@
     <AndroidAsset Include="Assets\Content\Tourtorial\ruka_green.png" />
     <AndroidAsset Include="Assets\Content\Shop\lock.png" />
     <AndroidAsset Include="Assets\Content\Shop\scroll.png" />
+    <AndroidAsset Include="Assets\Content\Shop\broj_dj.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup>

@@ -10,7 +10,7 @@ using Android.Gms.Ads;
 
 namespace Tica_Android_2
 {
-	class adlistener : AdListener
+	public class adlistener : AdListener
 	{
 		// Declare the delegate (if using non-generic pattern). 
 		public delegate void AdLoadedEvent();

@@ -54,7 +54,7 @@ namespace Tica_Android_2
 			texture = podium_bird [selected_bird];
 			if (rectangle.Y > (visina - rectangle.Height))
 			{
-				speed_buffer += (visina/9.5f* (float)gameTime.ElapsedGameTime.TotalSeconds);
+				speed_buffer += (visina/13f* (float)gameTime.ElapsedGameTime.TotalSeconds);
 				if (speed_buffer > 1) {
 					speed_buffer--;
 					rectangle.Y--;

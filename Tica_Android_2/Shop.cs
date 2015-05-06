@@ -18,17 +18,19 @@ namespace Tica_Android_2
 		Texture2D Check_sign;
 		Sprite scroll;
 		public Score ispis_brojeva;
+		Sprite vise_dijamanata;
 
 
 
 		public Shop (int selected,string unlocked_b,ContentManager cm,float scale,int sirina, List<Texture2D> znamenke )
 		{
 			ispis_brojeva = new Score (znamenke);
-			scroll = new Sprite (new Rectangle((int)(sirina/2 - 255*scale),(int)(100*scale),(int)(550*scale),(int)(250*scale)),cm.Load<Texture2D>("Shop/scroll"));
+			scroll = new Sprite (new Rectangle((int)(sirina/2 - 255*scale),(int)(100*scale),(int)(550*scale),(int)(300*scale)),cm.Load<Texture2D>("Shop/scroll"));
 			Lock =cm.Load<Texture2D> ("Shop/lock");
 			Check_sign = cm.Load<Texture2D> ("Shop/check");
 			Bird_select_button = new Skin_button[4];
 
+			vise_dijamanata = new Sprite(new Rectangle((int)(300*scale),(int)(320*scale),(int)(70*scale),(int)(50*scale)),cm.Load<Texture2D>("Shop/broj_dj"));
 			Bird_select_button [0] = new Skin_button (new Rectangle ((int)(sirina/2 - 205*scale), (int)(150 * scale), (int)(100 * scale), (int)(100 * scale)),cm.Load<Texture2D> ("Shop/tica_0"),0);
 			Bird_select_button [1] = new Skin_button (new Rectangle ((int)(sirina/2 - 100*scale), (int)(150 * scale), (int)(100 * scale), (int)(100 * scale)),cm.Load<Texture2D> ("Shop/tica_1"),0);
 			Bird_select_button [2] = new Skin_button (new Rectangle ((int)(sirina/2 +5*scale), (int)(150 * scale), (int)(100 * scale), (int)(100 * scale)),cm.Load<Texture2D> ("Shop/tica_2"),0 );
@@ -94,7 +96,8 @@ namespace Tica_Android_2
 					spriteBatch.Draw (Check_sign, Bird_select_button [i].rectangle, Color.White);
 				
 			}
-			ispis_brojeva.Draw (spriteBatch, (int)(300*scale),(int)(280*scale),(int)(20*scale), (int)(50*scale));
+			vise_dijamanata.Draw (spriteBatch);
+			ispis_brojeva.Draw (spriteBatch, (int)(360*scale),(int)(280*scale),(int)(20*scale), (int)(50*scale));
 		}
 	}
 }
