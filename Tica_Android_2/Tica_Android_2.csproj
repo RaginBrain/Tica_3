@@ -90,6 +90,7 @@
     <Compile Include="Strelice.cs" />
     <Compile Include="AdListener.cs" />
     <Compile Include="AdWrapper.cs" />
+    <Compile Include="Hint.cs" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\Icon.png" />
@@ -171,6 +172,9 @@
     <AndroidAsset Include="Assets\Content\Shop\lock.png" />
     <AndroidAsset Include="Assets\Content\Shop\scroll.png" />
     <AndroidAsset Include="Assets\Content\Shop\broj_dj.png" />
+    <AndroidAsset Include="Assets\Content\Botuni\pergament.png" />
+    <AndroidAsset Include="Assets\Content\Botuni\kvadrat.png" />
+    <AndroidAsset Include="Assets\Content\Botuni\h_strelica.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup>

@@ -85,11 +85,16 @@ namespace Tica_Android_2
 	}
 	public class Barijera : Sprite
 	{
+		public float speed_step;
 		public string tip;
 		protected CoinWizzard CoinWizz;
 		protected Random r = new Random();
 		public bool coiniziran;
 
+		public void Ubrzaj()
+		{
+			brzina_kretanja += speed_step;
+		}
 		public Barijera(Texture2D tex, Rectangle rect,float resize_scale,CoinWizzard CoinW)
 		{
 			tip="obicna";
@@ -97,7 +102,8 @@ namespace Tica_Android_2
 			texture = tex;
 			coiniziran = false;
 			rectangle =  new Rectangle(rect.X, (int)(resize_scale*rect.Y), (int)Math.Round(rect.Width*resize_scale) , (int)Math.Round(rect.Height*resize_scale));
-			brzina_kretanja =(int) 3;
+			brzina_kretanja = 3;
+			speed_step = brzina_kretanja *.25f;
 			speed_buffer = 0;
 		}
 		public Barijera()
@@ -150,7 +156,8 @@ namespace Tica_Android_2
 
 				lista.RemoveAt (0);
 				lista.Add (this);
-				dodatak = (int)(dodatak * 0.985f);
+				if(dodatak>150*speed_scale)
+					dodatak = (int)(dodatak * 0.985f);
 				CoinWizz.Ubaci_Coine (lista_c, visina, speed_scale,this);
 			}
 		}

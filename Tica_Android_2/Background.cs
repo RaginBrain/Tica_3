@@ -36,11 +36,17 @@ namespace Tica_Android_2
 
 	public class Scrolling : Sprite
 	{
+		public float speed_step;
+		public void Ubrzaj()
+		{
+			brzina_kretanja += speed_step;
+		}
 		public Scrolling(Texture2D newTexture, Rectangle newRectangle,int brzina)
 		{
 			texture = newTexture;
 			rectangle = newRectangle;
 			brzina_kretanja = brzina;
+			speed_step = brzina_kretanja * .25f;
 			speed_buffer = 0;
 		}
 
@@ -58,7 +64,7 @@ namespace Tica_Android_2
 	public  class Player : Sprite
 	{
 		public Animation playerAnimation=new Animation();
-
+		public float speed_step;
 		bool maknut;
 		bool game_over_charge;
 		public bool ubodena_s_liva;
@@ -95,15 +101,21 @@ namespace Tica_Android_2
 		public void Initialize()
 		{
 		}
+
+		public void Ubrzaj()
+		{
+			speed += speed_step;
+		}
 		public Player(Texture2D[] tex,Texture2D[] tex_stit,Texture2D[] tex_ranjena,Rectangle rect,float resize_scale, int selct)
 		{
-
+			
 			niz_base_skin= tex;
 			niz_stit_skin=tex_stit;
 			niz_ranjena_skin= tex_ranjena;
 
 			maknut = false; // true kad stiscemo joystick
 			speed = 6*resize_scale;
+			speed_step = speed * .15f;
 			texture = niz_base_skin[selct];
 			texture_stit = niz_stit_skin[selct];
 			ranjena = niz_ranjena_skin [selct];

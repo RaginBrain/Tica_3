@@ -24,11 +24,15 @@ namespace Tica_Android_2
 	/// </summary>
 	public class Game1 : Microsoft.Xna.Framework.Game
 	{	
+
+		Hint hint;
 		public bool napravljeni;
 		public int add_counter;
 		public Context context;
 		HealthBar akceleracija_bar;
 		Sprite Score_scroll;
+		Sprite support_scroll;
+
 		Sprite repeat_button;
 		Sprite back_button;
 
@@ -43,6 +47,7 @@ namespace Tica_Android_2
 
 		HS_podium hs_podium;
 		Texture2D[] hs_tice;
+
 
 		bool upaljena_pisma_igre;
 		Song pjesma_igre;
@@ -63,6 +68,7 @@ namespace Tica_Android_2
 		Vector2 maca_origin;
 		Texture2D coin_texture;
 
+		Texture2D support;
 		Texture2D[] base_skins;
 		Texture2D[] stit_skins;
 		Texture2D[] ranjena_skins;
@@ -94,17 +100,18 @@ namespace Tica_Android_2
 		}
 		public void LelevUp()
 		{
-			scrolling1.brzina_kretanja += 0.6f*scale;
-			scrolling2.brzina_kretanja += 0.6f*scale;
+			
+			scrolling1.Ubrzaj ();
+			scrolling2.Ubrzaj ();
 			lvlUp.brzina_kretanja = scrolling1.brzina_kretanja;
-			barijera1.brzina_kretanja += 0.6f*scale;
-			barijera2.brzina_kretanja += 0.6f*scale;
-			barijera3.brzina_kretanja += 0.6f*scale;
-			barijera.brzina_kretanja += 0.6f*scale;
-			player1.speed += (0.6f*scale);
+			barijera1.brzina_kretanja = scrolling1.brzina_kretanja;
+			barijera2.brzina_kretanja = scrolling1.brzina_kretanja;
+			barijera3.brzina_kretanja = scrolling1.brzina_kretanja;
+			barijera.brzina_kretanja = scrolling1.brzina_kretanja;
+			player1.speed  *= 1.1f;
 			sljedeciLevel += 1;
-			maca.brzina_kretanja += 0.6f*scale;
-			maca2.brzina_kretanja += 0.6f*scale;
+			maca.brzina_kretanja = scrolling1.brzina_kretanja;
+			maca2.brzina_kretanja = scrolling1.brzina_kretanja;
 			pila.brzina_kretanja = maca.brzina_kretanja + 1*scale;
 
 		}
@@ -120,8 +127,7 @@ namespace Tica_Android_2
 		Sprite start_button;
 		Sprite options_button;
 		Sprite shop_button;
-		Sprite centar_hint;
-		bool centar_hint_bool;
+
 
 		Sprite game_over;
 		Stopwatch sat;
@@ -219,7 +225,6 @@ namespace Tica_Android_2
 			rotacija_pile = 0;
 			currentGameState = GameState.Start;
 			upaljena_pisma_igre = false;
-			centar_hint_bool = false;
 
 			//gamesave
 			if (savegameStorage.FileExists ("high_score.txt")) {
@@ -270,6 +275,9 @@ namespace Tica_Android_2
 			scrolling1 = new Scrolling(Content.Load<Texture2D>("bg1"), new Rectangle(0, 0, sirina, visina), 3);
 			scrolling2 = new Scrolling(Content.Load<Texture2D>("bg2"), new Rectangle(sirina, 0,sirina, visina), 3);
 
+			hint = new Hint (scale,sirina);
+			hint.LoadContent (Content,scale);
+
 			hs_tice=new Texture2D[4];
 			for (int i = 0; i < 4; i++) {
 				hs_tice [i] = Content.Load<Texture2D> ("HighScore/tica" + i.ToString ());
@@ -316,11 +324,11 @@ namespace Tica_Android_2
 			kruna=Content.Load<Texture2D>("kruna");
 
 			Score_scroll=new Sprite(new Rectangle((int)((sirina/2)-190*scale),(int)(-260*scale),(int)(380*scale),(int)(260*scale)),Content.Load<Texture2D>("Botuni/score_scroll"));
+			support_scroll=new Sprite(new Rectangle((int)((sirina/2)-190*scale),(int)(-390*scale),(int)(350*scale),(int)(380*scale)),Content.Load<Texture2D>("Botuni/pergament"));
 
 			start_button = new Sprite (new Rectangle ((int)(sirina / 2 - 165*scale), 0, (int)(350*scale),(int)(165*scale)),Content.Load<Texture2D> ("Botuni/oblak_start"));
 			options_button = new Sprite (new Rectangle ((int)(sirina -(270*scale)),  (int)(50*scale), (int)(250*scale),(int)(130*scale)),Content.Load<Texture2D> ("Botuni/options_oblak"));
 			shop_button = new Sprite (new Rectangle ((int)(20*scale), (int)(50*scale), (int)(250*scale),(int)(130*scale)),Content.Load<Texture2D> ("Botuni/shop_oblak"));
-			centar_hint = new Sprite (new Rectangle ((int)(sirina +100*scale),  (int)(50*scale), (int)(220*scale),(int)(125*scale)),Content.Load<Texture2D> ("Botuni/centar_hint"));
 
 			game_over = new Sprite (new Rectangle (-visina, 0, (int)(300*scale), (int)(409*scale)),Content.Load<Texture2D>("game_over"));
 			repeat_button = new Sprite (new Rectangle ((int)(sirina - (120 * scale)),(int)(visina - (visina / 4.5f) - 80 * scale),  (int)(60 * scale), (int)(80 * scale)), Content.Load<Texture2D> ("Botuni/repeat_jaje"));
@@ -490,10 +498,13 @@ namespace Tica_Android_2
 				scrolling1.Update (scale);
 				scrolling2.Update (scale);
 				//******************************************************************************
+				hint.Update(player1,high_score,scale);
 
 				if (add_counter>=3 && add_counter!=6) {
 					FinalAd = AdWrapper.ConstructFullPageAdd (context, "ca-app-pub-9649596465496350/6705151429");
 					intlistener = new adlistener ();
+					intlistener.AdLoaded += () => { if (FinalAd.IsLoaded && currentGameState==GameState.Score_show)FinalAd.Show(); };
+					FinalAd.AdListener = intlistener;
 					add_counter = 6;
 				}
 			
@@ -560,8 +571,6 @@ namespace Tica_Android_2
 					if (bar.rectangle.Y > (0 - bar.rectangle.Height)&&(sat.ElapsedMilliseconds > 500))
 						bar.rectangle.Y-=(int)(10*scale);
 				}
-				if (player1.score < 650 && player1.rectangle.X > (sirina - 300 * scale) && centar_hint_bool == false)
-					centar_hint_bool = true;
 
 				player1.Update (gameTime, graphics.PreferredBackBufferHeight, graphics.PreferredBackBufferWidth,scale);
 
@@ -618,24 +627,31 @@ namespace Tica_Android_2
 				if (add_counter >= 5) {
 					
 					add_counter = -1;
-					sat.Reset();
+					sat.Reset ();
 					sat.Start ();
 
 					napravljeni = true;
-					intlistener.AdLoaded += () => { if (FinalAd.IsLoaded && currentGameState==GameState.Score_show)FinalAd.Show(); };
-					FinalAd.AdListener = intlistener;
-					FinalAd.CustomBuild();
+
+					FinalAd.CustomBuild ();
 				}
+
+				if ((int)sat.Elapsed.Seconds < 4 && add_counter == -1)
+					game_shop.ispis_brojeva.Update (4 - (int)(sat.Elapsed.Seconds));
 
 				player1.Update (gameTime, visina, sirina, scale);
 				rezultat.Update (player1.score);
+
 				touchCollection = TouchPanel.GetState ();
 
-				if (centar_hint_bool && centar_hint.rectangle.X > (sirina - 200 * scale))
-					centar_hint.rectangle.X -= (int)(10 * scale);
-
-				if (Score_scroll.rectangle.Y < (visina / 2 - (int)(Score_scroll.rectangle.Height*3/4)))
-					Score_scroll.rectangle.Y += (int)(15 * scale);
+			
+				if (add_counter == -1) {
+					if (support_scroll.rectangle.Y < (visina / 2 - (int)(support_scroll.rectangle.Height * 3/ 5)))
+						support_scroll.rectangle.Y += (int)(10 * scale);
+				}
+				else {
+					if (Score_scroll.rectangle.Y < (visina / 2 - (int)(Score_scroll.rectangle.Height * 3 / 4)))
+						Score_scroll.rectangle.Y += (int)(15 * scale);
+				}
 				foreach (TouchLocation tl in touchCollection) 
 				{
 
@@ -738,7 +754,7 @@ namespace Tica_Android_2
 					spriteBatch.Begin (SpriteSortMode.Deferred, BlendState.NonPremultiplied);
 					scrolling1.Draw (spriteBatch);
 					scrolling2.Draw (spriteBatch);
-
+					hint.Draw (spriteBatch);
 					foreach (Coin x in test_lista_coina) 
 					{
 						x.Draw (spriteBatch, scale);
@@ -812,9 +828,15 @@ namespace Tica_Android_2
 
 				spriteBatch.Draw (repeat_button.texture, repeat_button.rectangle, Color.White);
 				spriteBatch.Draw (back_button.texture, back_button.rectangle, Color.White);
-				spriteBatch.Draw(Score_scroll.texture, Score_scroll.rectangle,Color.White);
-				spriteBatch.Draw (centar_hint.texture, centar_hint.rectangle, Color.White);
+				spriteBatch.Draw (Score_scroll.texture, Score_scroll.rectangle, Color.White);
+				spriteBatch.Draw (support_scroll.texture, support_scroll.rectangle, Color.White);
 
+
+				if (add_counter == -1) {
+					if (sat.Elapsed.Seconds < 4)
+						game_shop.ispis_brojeva.Draw (spriteBatch, (int)(sirina - (90 * scale)), (int)(visina - (visina / 4.5f) - 85 * scale), (int)(25 * scale), (int)(40 * scale));
+					rezultat.Draw (spriteBatch, support_scroll.rectangle.Center.X-(int)((player1.score.ToString().Length)*20*scale),support_scroll.rectangle.Y+(int)(250*scale),(int)(25*scale), (int)(40*scale));
+				}
 				try{
 					rezultat.Draw (spriteBatch, Score_scroll.rectangle.Center.X-(int)((player1.score.ToString().Length)*20*scale),Score_scroll.rectangle.Center.Y,(int)(30*scale), (int)(50*scale));
 				}
