@@ -25,6 +25,7 @@ namespace Tica_Android_2
 	public class Game1 : Microsoft.Xna.Framework.Game
 	{	
 
+		Oblak_Wizzard OWizz;
 		Hint hint;
 		public bool napravljeni;
 		public int add_counter;
@@ -267,6 +268,8 @@ namespace Tica_Android_2
 			pjesma_igre = Content.Load<Song> ("Zvukovi/pisma_igre");
 
 			//*****************
+			OWizz= new Oblak_Wizzard(Content,sirina,visina,scale);
+
 			test_lista_coina = new List<Coin> ();
 			txx = Content.Load<Texture2D> ("kocka");
 			red_prepreka = new List<Barijera> ();
@@ -568,11 +571,11 @@ namespace Tica_Android_2
 					sat.Restart ();
 
 				foreach (Barijera bar in red_prepreka) {
-					if (bar.rectangle.Y > (0 - bar.rectangle.Height)&&(sat.ElapsedMilliseconds > 500))
-						bar.rectangle.Y-=(int)(10*scale);
+					if (bar.rectangle.Y > (0 - bar.rectangle.Height) && (sat.ElapsedMilliseconds > 500))
+						bar.rectangle.Y -= (int)(10 * scale);
 				}
 
-				player1.Update (gameTime, graphics.PreferredBackBufferHeight, graphics.PreferredBackBufferWidth,scale);
+				player1.Update (gameTime, graphics.PreferredBackBufferHeight, graphics.PreferredBackBufferWidth, scale);
 
 				
 
@@ -635,8 +638,12 @@ namespace Tica_Android_2
 					FinalAd.CustomBuild ();
 				}
 
+
+					
+
 				if ((int)sat.Elapsed.Seconds < 4 && add_counter == -1)
 					game_shop.ispis_brojeva.Update (4 - (int)(sat.Elapsed.Seconds));
+				
 
 				player1.Update (gameTime, visina, sirina, scale);
 				rezultat.Update (player1.score);
@@ -651,6 +658,7 @@ namespace Tica_Android_2
 				else {
 					if (Score_scroll.rectangle.Y < (visina / 2 - (int)(Score_scroll.rectangle.Height * 3 / 4)))
 						Score_scroll.rectangle.Y += (int)(15 * scale);
+					OWizz.Update (scale);
 				}
 				foreach (TouchLocation tl in touchCollection) 
 				{
@@ -661,9 +669,11 @@ namespace Tica_Android_2
 
 						if (tl.State == TouchLocationState.Pressed && repeat_button.rectangle.Intersects (pozicija_dodira ) && (sat.Elapsed.Seconds>3 || add_counter!=-1)) {
 							Initialize ();
+							OWizz.Clear ();
 							currentGameState = GameState.Ready;
 						}
 						if (tl.State == TouchLocationState.Pressed && back_button.rectangle.Intersects (pozicija_dodira)) {
+							OWizz.Clear ();
 							Initialize ();
 
 						}
@@ -824,6 +834,7 @@ namespace Tica_Android_2
 				scrolling1.Draw (spriteBatch);
 				scrolling2.Draw (spriteBatch);
 
+				OWizz.Draw (spriteBatch);
 				player1.draw_ranjena (spriteBatch);
 
 				spriteBatch.Draw (repeat_button.texture, repeat_button.rectangle, Color.White);

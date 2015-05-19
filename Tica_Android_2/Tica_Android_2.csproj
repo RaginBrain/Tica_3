@@ -91,6 +91,7 @@
     <Compile Include="AdListener.cs" />
     <Compile Include="AdWrapper.cs" />
     <Compile Include="Hint.cs" />
+    <Compile Include="Oblak_Wizzard.cs" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\Icon.png" />
@@ -175,6 +176,10 @@
     <AndroidAsset Include="Assets\Content\Botuni\pergament.png" />
     <AndroidAsset Include="Assets\Content\Botuni\kvadrat.png" />
     <AndroidAsset Include="Assets\Content\Botuni\h_strelica.png" />
+    <AndroidAsset Include="Assets\Content\Botuni\oblak_upitnik.png" />
+    <AndroidAsset Include="Assets\Content\Botuni\fly.png" />
+    <AndroidAsset Include="Assets\Content\Botuni\how.png" />
+    <AndroidAsset Include="Assets\Content\Botuni\to.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup>
