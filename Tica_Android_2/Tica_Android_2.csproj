@@ -29,6 +29,7 @@
     <AndroidLinkMode>None</AndroidLinkMode>
     <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
     <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -38,6 +39,8 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
+    <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -85,13 +88,14 @@
     <Compile Include="Shop.cs" />
     <Compile Include="HS_podium.cs" />
     <Compile Include="Tourtorial.cs" />
-    <Compile Include="MuteBotun.cs" />
     <Compile Include="HealthBar.cs" />
     <Compile Include="Strelice.cs" />
     <Compile Include="AdListener.cs" />
     <Compile Include="AdWrapper.cs" />
     <Compile Include="Hint.cs" />
     <Compile Include="Oblak_Wizzard.cs" />
+    <Compile Include="Jojstick.cs" />
+    <Compile Include="BoolButton.cs" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\Icon.png" />
@@ -180,8 +184,22 @@
     <AndroidAsset Include="Assets\Content\Botuni\fly.png" />
     <AndroidAsset Include="Assets\Content\Botuni\how.png" />
     <AndroidAsset Include="Assets\Content\Botuni\to.png" />
+    <AndroidAsset Include="Assets\Content\Botuni\unhold_upozorenje.png" />
+    <AndroidAsset Include="Assets\Content\jojstic_pozadina.png" />
+    <AndroidAsset Include="Assets\Content\Botuni\jojstic_button.png" />
+    <AndroidAsset Include="Assets\Content\Botuni\TV_arrow.png" />
+    <AndroidAsset Include="Assets\Content\Botuni\TV_jojstick.png" />
+    <AndroidAsset Include="Assets\Content\Botuni\credits button.png" />
+    <AndroidAsset Include="Assets\Content\Botuni\pisma_on.png" />
+    <AndroidAsset Include="Assets\Content\Botuni\pisma_off.png" />
+    <AndroidAsset Include="Assets\Content\Botuni\credits.png" />
+    <AndroidAsset Include="Assets\Content\Shop\upitnik.png" />
+    <AndroidAsset Include="Assets\Content\Zvukovi\button_click.wav" />
+    <AndroidAsset Include="Assets\Content\Zvukovi\error_button.wav" />
+    <AndroidAsset Include="Assets\Content\Botuni\TV_Controls_jojstick.png" />
+    <AndroidAsset Include="Assets\Content\Botuni\TV_Controls_arrow.png" />
+    <AndroidAsset Include="Assets\Content\high_score_table.png" />
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Assets\Content\Znamenke\" />
     <Folder Include="Assets\Content\Zvukovi\" />
@@ -191,4 +209,5 @@
     <Folder Include="Assets\Content\HighScore\" />
     <Folder Include="Assets\Content\Tourtorial\" />
   </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>

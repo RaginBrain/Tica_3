@@ -9,13 +9,14 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework.Audio;
 namespace Tica_Android_2
 {
-	public class MuteBotun:Sprite
+	public class BoolButton:Sprite
 	{
 		public Texture2D mute_off_tex;
 		public Texture2D selected_tex;
 
-		public MuteBotun(Rectangle r, Texture2D mON, Texture2D mOFF, bool mute_on)
+		public BoolButton(Rectangle r, Texture2D mON, Texture2D mOFF, bool mute_on)
 		{
+			
 			rectangle = r;
 			texture = mON;
 			mute_off_tex = mOFF;

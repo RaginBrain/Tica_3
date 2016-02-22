@@ -1,13 +1,17 @@
 ﻿<Properties StartupItem="Tica_Android_2\Tica_Android_2.csproj">
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Android.YT91116GD2" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Tica_Android_2\Game1.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Android.480x800_hdpi_3.7inch" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Tica_Android_2\Shop.cs">
     <Files>
-      <File FileName="Tica_Android_2\Game1.cs" Line="661" Column="27" />
-      <File FileName="Tica_Android_2\Shop.cs" Line="1" Column="1" />
-      <File FileName="Tica_Android_2\Strelice.cs" Line="1" Column="1" />
-      <File FileName="Tica_Android_2\Tourtorial.cs" Line="1" Column="1" />
-      <File FileName="Tica_Android_2\Hint.cs" Line="37" Column="4" NotebookId="1" />
-      <File FileName="Tica_Android_2\Oblak_Wizzard.cs" Line="39" Column="28" NotebookId="1" />
+      <File FileName="Tica_Android_2\Background.cs" Line="1" Column="1" />
+      <File FileName="Tica_Android_2\Game1.cs" Line="1" Column="1" />
+      <File FileName="Tica_Android_2\Barijera.cs" Line="1" Column="1" />
+      <File FileName="Tica_Android_2\BoolButton.cs" Line="1" Column="1" />
+      <File FileName="Tica_Android_2\Coin.cs" Line="1" Column="1" />
+      <File FileName="Tica_Android_2\CoinWizzard.cs" Line="1" Column="1" />
+      <File FileName="Tica_Android_2\HealthBar.cs" Line="1" Column="1" />
+      <File FileName="Tica_Android_2\Shop.cs" Line="31" Column="1" />
+      <File FileName="Tica_Android_2\HS_podium.cs" Line="1" Column="1" />
+      <File FileName="Tica_Android_2\Jojstick.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

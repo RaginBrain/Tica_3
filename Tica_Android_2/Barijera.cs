@@ -83,6 +83,8 @@ namespace Tica_Android_2
 			speed_buffer = 0;
 		}
 	}
+
+
 	public class Barijera : Sprite
 	{
 		public float speed_step;
@@ -110,7 +112,7 @@ namespace Tica_Android_2
 		{
 		}
 
-		public virtual void Update(Player igrac,ref int dodatak,int visina,int sirina,List<Barijera> lista, float speed_scale,Song stit_off,List<Coin> lista_c)
+		public virtual void Update(Player igrac,ref int dodatak,int visina,int sirina,List<Barijera> lista, float speed_scale,Song stit_off,List<Coin> lista_c,bool camper)
 		{
 
 
@@ -135,29 +137,41 @@ namespace Tica_Android_2
 
 			if (rectangle.X < (-50*speed_scale))
 			{
-				igrac.score+=25;
+				igrac.score+=15;
 
 
 				rectangle.X = lista[lista.Count-1].rectangle.X+dodatak;
 				int visina_zadnje = lista [lista.Count - 1].rectangle.Y;
-				if (visina_zadnje > visina / 2)
+
+				if (!camper) {
+					if (visina_zadnje > visina / 2)
+						rectangle = new Rectangle (
+							lista [lista.Count - 1].rectangle.X + dodatak,
+							r.Next (0, (int)(visina / 2) - rectangle.Height),
+							(int)(35 * speed_scale), r.Next ((int)(80 * speed_scale), (int)(100 * speed_scale))
+						);
+					else
+						rectangle = new Rectangle (
+							lista [lista.Count - 1].rectangle.X + dodatak,
+							rectangle.Y = r.Next ((int)(visina / 2), (int)(visina - visina / 4.3f - rectangle.Height))  ,
+							(int)(35 * speed_scale), r.Next ((int)(80 * speed_scale),
+							(int)(100 * speed_scale))
+						);
+				} else
+				{
 					rectangle = new Rectangle (
 						lista [lista.Count - 1].rectangle.X + dodatak,
-						r.Next (0, (int)(visina / 2) - rectangle.Height),
-						(int)(35*speed_scale), r.Next ((int)(80*speed_scale),(int)(100*speed_scale))
+						rectangle.Y = (int)(igrac.rectangle.Y - 10*speed_scale),
+
+						(int)(35 * speed_scale), r.Next ((int)(80 * speed_scale),
+						(int)(100 * speed_scale))
 					);
-				
-				else
-					rectangle = new Rectangle(
-					lista [lista.Count - 1].rectangle.X + dodatak,
-					rectangle.Y = r.Next ((int)(visina/2), (int)(visina-visina/4.3f - rectangle.Height)),
-						(int)(35*speed_scale), r.Next ((int)(80*speed_scale),(int)(100*speed_scale))
-					);
+				}
 
 				lista.RemoveAt (0);
 				lista.Add (this);
-				if(dodatak>150*speed_scale)
-					dodatak = (int)(dodatak * 0.985f);
+				if(dodatak>190*speed_scale)
+					dodatak = (int)(dodatak * 0.982f);
 				CoinWizz.Ubaci_Coine (lista_c, visina, speed_scale,this);
 			}
 		}
@@ -194,9 +208,9 @@ namespace Tica_Android_2
 
 		}
 
-		public override void Update(Player igrac,ref int dodatak,int visina,int sirina,List<Barijera> lista, float speed_scale,Song stit_off,List<Coin> lista_c)
+		public override void Update(Player igrac,ref int dodatak,int visina,int sirina,List<Barijera> lista, float speed_scale,Song stit_off,List<Coin> lista_c,bool camper)
 		{
-			base.Update (igrac,ref dodatak,visina,sirina,lista,speed_scale,stit_off,lista_c);
+			base.Update (igrac,ref dodatak,visina,sirina,lista,speed_scale,stit_off,lista_c,camper);
 			if (rectangle.X < -20)
 			{
 				brzina_gibanja = r.Next(0,3);

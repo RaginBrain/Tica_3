@@ -6,12 +6,14 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Audio;
+using System.Diagnostics;
 
 
 namespace Tica_Android_2
 {
 	public class Sprite
 	{
+
 
 		public float brzina_kretanja;
 		public float speed_buffer;
@@ -29,6 +31,7 @@ namespace Tica_Android_2
 			rectangle = rect;
 			texture = tex;
 		}
+
 		public Sprite()
 		{
 		}
@@ -69,7 +72,7 @@ namespace Tica_Android_2
 		bool game_over_charge;
 		public bool ubodena_s_liva;
 
-
+		public Stopwatch sat;
 
 		Texture2D[] niz_base_skin;
 		Texture2D[] niz_stit_skin;
@@ -90,7 +93,8 @@ namespace Tica_Android_2
 		private int udajenost_X;
 		private int udaljenost_Y;
 		private Point centar;
-
+		private float pomakX;
+		private float pomakY;
 
 		public float Speed
 		{
@@ -108,7 +112,7 @@ namespace Tica_Android_2
 		}
 		public Player(Texture2D[] tex,Texture2D[] tex_stit,Texture2D[] tex_ranjena,Rectangle rect,float resize_scale, int selct)
 		{
-			
+			sat = new Stopwatch ();
 			niz_base_skin= tex;
 			niz_stit_skin=tex_stit;
 			niz_ranjena_skin= tex_ranjena;
@@ -131,6 +135,7 @@ namespace Tica_Android_2
 			colision_rect = new Rectangle (rect.X, rect.Y, (int)(rectangle.Width*0.8f), (int)(rectangle.Height * 0.6f));
 			game_over_charge = false;
 			ubodena_s_liva = false;
+		
 
 
 
@@ -143,7 +148,7 @@ namespace Tica_Android_2
 			ranjena = niz_ranjena_skin[selct];
 		}
 
-		public void Update(GameTime gameTime,int visina_ekrana, int duljina,float resize_scale)
+		public void Update(GameTime gameTime,int visina_ekrana, int duljina,float resize_scale, Jojstick jstc,bool ultra)
 		{
 			if (alive) {
 				maknut = false;
@@ -168,12 +173,12 @@ namespace Tica_Android_2
 				foreach (TouchLocation tl in touchCollection) 
 				{
 
-
+				
 					if ((tl.State == TouchLocationState.Pressed)
 						|| (tl.State == TouchLocationState.Moved))
 					{
 						//******************************
-
+						if (!ultra) {
 							maknut = true;
 							centar = colision_rect.Center;
 							udaljenost_Y = (int)(Math.Abs (centar.Y - tl.Position.Y));
@@ -199,10 +204,49 @@ namespace Tica_Android_2
 									Velocity.X += speed * (float)gameTime.ElapsedGameTime.TotalSeconds * faktor_X;
 								Velocity.X += speed * (float)gameTime.ElapsedGameTime.TotalSeconds * faktor_X * 2;
 							}
+						} 
+						else {
+							maknut = true;
+							jstc.update (tl, speed, resize_scale);
+
+//							if(jstc.FaktX*Velocity.X<0)
+//								Velocity.X += speed * jstc.FaktX * jstc.postotak*(float)gameTime.ElapsedGameTime.TotalSeconds*3;
+//							if(jstc.FaktY*Velocity.Y<0)
+//								Velocity.Y += speed * jstc.FaktY* jstc.postotak *(float)gameTime.ElapsedGameTime.TotalSeconds*3;	
+
+
+							Velocity.X += speed *jstc.bonus* jstc.FaktX * jstc.postotak*(float)gameTime.ElapsedGameTime.TotalSeconds*1.75f;
+							Velocity.Y += speed *jstc.bonus* jstc.FaktY* jstc.postotak *(float)gameTime.ElapsedGameTime.TotalSeconds*1.75f;
+
+							pomakX =resize_scale*jstc.FaktX/ Math.Abs(jstc.FaktX)+ (.50f*speed * jstc.bonus * jstc.FaktX * jstc.postotak);
+							pomakY =resize_scale*jstc.FaktY/ Math.Abs(jstc.FaktY)+ (.50f*speed * jstc.bonus * jstc.FaktY * jstc.postotak);
+
+							if ((colision_rect.Y > (visina_ekrana - visina_ekrana / 4.35f)) && pomakY > 0)
+								pomakY = 0;
+							if ((colision_rect.Y < 0) && pomakY < 0)
+								pomakY = 0;
+							
+							if ((colision_rect.X < -5) && pomakX < 0)
+								pomakX = 0;
+							if (colision_rect.X > duljina - colision_rect.Width && pomakX > 0)
+								pomakX = 0;
+								
+
+							
+
+							rectangle.Y += (int)(Math.Round (pomakY));
+							rectangle.X += (int)(Math.Round (pomakX));
+						}
 						//****************************
 					}
 				}
 				if (!maknut) {
+
+					if (ultra) {
+						jstc.Vracaj_Tocku ();
+					}
+					sat.Restart ();
+
 					if (Velocity.X > 0)
 						Velocity.X -= Velocity.X / 30f;
 					if (Velocity.X < 0)
@@ -262,7 +306,10 @@ namespace Tica_Android_2
 				Velocity.Y += speed * (float)gameTime.ElapsedGameTime.TotalSeconds*1.5f;
 				colision_rect.Y += (int)Velocity.Y;
 
+
 				rectangle.Y += (int)Velocity.Y;
+				
+
 				rectangle.X += (int)Velocity.X;
 			}
 		}

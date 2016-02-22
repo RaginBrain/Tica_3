@@ -33,12 +33,18 @@ namespace Tica_Android_2
 		HealthBar akceleracija_bar;
 		Sprite Score_scroll;
 		Sprite support_scroll;
+		Sprite Credits_Table;
 
 		Sprite repeat_button;
 		Sprite back_button;
+		Jojstick joj;
 
-		MuteBotun mute_button;
+		BoolButton mute_button;
+		BoolButton music_button;
+		BoolButton ultra_hard_mode;
+		bool ultra_hard;
 		bool mute_on;
+		bool music_on;
 
 		Shop game_shop;
 
@@ -49,6 +55,8 @@ namespace Tica_Android_2
 		HS_podium hs_podium;
 		Texture2D[] hs_tice;
 
+		int uhm_udaljenostX;
+		int uhm_udaljenostY;
 
 		bool upaljena_pisma_igre;
 		Song pjesma_igre;
@@ -62,9 +70,12 @@ namespace Tica_Android_2
 		Song stit_out;
 		SoundEffect coin_zvuk;
 		SoundEffect dijamant_zvuk;
+		SoundEffect click;
 		Song game_over_sound;
 
 		Texture2D kruna;
+		Texture2D tabla_hs;
+
 		float maca_scale;
 		Vector2 maca_origin;
 		Texture2D coin_texture;
@@ -80,7 +91,7 @@ namespace Tica_Android_2
 		Tourtorial tourt;
 
 
-		enum GameState { Start, InGame, GameOver, Turtorial, Ready, Score_show, Options, Shop,High_score_show };
+		enum GameState { Start, InGame, GameOver, Turtorial, Ready, Score_show, Credits, Shop,High_score_show };
 		GameState currentGameState = GameState.InGame;
 
 
@@ -96,6 +107,14 @@ namespace Tica_Android_2
 				if (mute_on)
 					sw.WriteLine ("true");
 				else if (!mute_on)
+					sw.WriteLine ("false");
+				if (music_on)
+					sw.WriteLine ("true");
+				else if (!music_on)
+					sw.WriteLine ("false");
+				if (ultra_hard)
+					sw.WriteLine ("true");
+				else if (!ultra_hard)
 					sw.WriteLine ("false");
 			}	
 		}
@@ -126,18 +145,23 @@ namespace Tica_Android_2
 		List<Texture2D> lista_txtr;
 
 		Sprite start_button;
-		Sprite options_button;
+		Sprite credits_button;
 		Sprite shop_button;
 
 
 		Sprite game_over;
 		Stopwatch sat;
+		Stopwatch camp_timer;
+		int camp_position;
+		bool camping;
+		bool camp_trap;
 
 		Barijera maca,maca2;
 		Barijera pila;
 		float rotacija_pile;
 		Vector2 pila_origin;
 		float pila_scale;
+
 
 		Stit stit;
 		LevelUp lvlUp;
@@ -161,6 +185,9 @@ namespace Tica_Android_2
 		TouchCollection touchCollection;
 		int sirina;
 		int visina;
+
+		Texture2D cntrl_arrow;
+		Texture2D cntrl_jstck;
 
 		public Game1()
 		{
@@ -190,8 +217,16 @@ namespace Tica_Android_2
 						mute_on = true;
 					else if(sr.ReadLine() == "false")
 						mute_on = false;
+					if (sr.ReadLine() == "true")
+						music_on = true;
+					else if(sr.ReadLine() == "false")
+						music_on = false;
+					if (sr.ReadLine() == "true")
+						ultra_hard = true;
+					else if(sr.ReadLine() == "false")
+						ultra_hard = false;
+				}
 
-				}	
 			} 
 			else {
 				high_score = 0;
@@ -199,6 +234,8 @@ namespace Tica_Android_2
 				unlocked_birds="xxx";
 				racun = 0;
 				mute_on = false;
+				music_on = false;
+				ultra_hard = false;
 				Save ();
 			}
 		}
@@ -223,6 +260,9 @@ namespace Tica_Android_2
 			player1.playerAnimation.Initialize();
 			sljedeciLevel = lvlUp.level + 1;
 			sat = new Stopwatch ();
+			camping = false;
+			camp_trap = false;
+			camp_timer = new Stopwatch ();
 			rotacija_pile = 0;
 			currentGameState = GameState.Start;
 			upaljena_pisma_igre = false;
@@ -239,6 +279,14 @@ namespace Tica_Android_2
 						mute_on = true;
 					else
 						mute_on = false;
+					if (sr.ReadLine() == "true")
+						music_on = true;
+					else if(sr.ReadLine() == "false")
+						music_on = false;
+					if (sr.ReadLine() == "true")
+						ultra_hard = true;
+					else if(sr.ReadLine() == "false")
+						ultra_hard = false;
 				}	
 			} 
 			else {
@@ -247,6 +295,8 @@ namespace Tica_Android_2
 				unlocked_birds="xxx";
 				racun = 0;
 				mute_on = false;
+				ultra_hard = false;
+				music_on = false;
 				Save ();	
 			}
 		}
@@ -266,6 +316,7 @@ namespace Tica_Android_2
 			dijamant_zvuk= Content.Load<SoundEffect>("Zvukovi/dijamant_zvuk");
 			game_over_sound = Content.Load<Song>("Zvukovi/game_over_sound");
 			pjesma_igre = Content.Load<Song> ("Zvukovi/pisma_igre");
+			click = Content.Load<SoundEffect>("Zvukovi/button_click");
 
 			//*****************
 			OWizz= new Oblak_Wizzard(Content,sirina,visina,scale);
@@ -286,12 +337,15 @@ namespace Tica_Android_2
 				hs_tice [i] = Content.Load<Texture2D> ("HighScore/tica" + i.ToString ());
 			}
 
+			Credits_Table = new Sprite(new Rectangle((int)((sirina/2)-150*scale),(int)(0),(int)(340*scale),(int)(420*scale)),Content.Load<Texture2D> ("Botuni/credits"));
+
 			tourt = new Tourtorial ();
 			tourt.LoadContent (Content);
 			tourt.Postavi_varijable (scale);
 
 			hs_podium = new HS_podium (Content.Load<Texture2D> ("HighScore/hs_bg"), Content.Load<Texture2D> ("HighScore/fc"), hs_tice, visina, sirina,scale,selected_bird,Content.Load<Song>("HighScore/pobjeda_song"),Content.Load<Song>("HighScore/pobjeda_song_2"));
 			akceleracija_bar = new HealthBar (Content.Load<Texture2D> ("okvir"), Content.Load<Texture2D> ("fill"),scale, new Rectangle ((int)(85*scale),(int)(4*scale), 120, 23));
+			joj = new Jojstick (scale, visina,sirina, Content);
 
 			base_skins= new Texture2D[4];
 			stit_skins=new Texture2D[4];
@@ -305,7 +359,8 @@ namespace Tica_Android_2
 			}
 
 		
-
+			cntrl_arrow= Content.Load<Texture2D> ("Botuni/TV_Controls_arrow");
+			cntrl_jstck = Content.Load<Texture2D> ("Botuni/TV_Controls_jojstick");
 		
 
 			player1 = new Player(base_skins,stit_skins,ranjena_skins, new Rectangle((visina-(int)(visina/4.35f))/2, (visina-(int)(visina/4.35f))/2,50, 50),scale,selected_bird);
@@ -322,25 +377,35 @@ namespace Tica_Android_2
 			rezultat = new Score (lista_txtr);
 
 
-			game_shop = new Shop ( selected_bird, unlocked_birds,Content, scale, sirina,lista_txtr);
+			game_shop = new Shop ( selected_bird, unlocked_birds,Content, scale, sirina,lista_txtr,click);
 			turtorial_tex = Content.Load<Texture2D> ("turtorial");
 			kruna=Content.Load<Texture2D>("kruna");
+			tabla_hs = Content.Load<Texture2D> ("high_score_table");
 
-			Score_scroll=new Sprite(new Rectangle((int)((sirina/2)-190*scale),(int)(-260*scale),(int)(380*scale),(int)(260*scale)),Content.Load<Texture2D>("Botuni/score_scroll"));
+			Score_scroll=new Sprite(new Rectangle((int)((sirina/2)-250*scale),(int)(-280*scale),(int)(500*scale),(int)(280*scale)),Content.Load<Texture2D>("Botuni/score_scroll"));
 			support_scroll=new Sprite(new Rectangle((int)((sirina/2)-190*scale),(int)(-390*scale),(int)(350*scale),(int)(380*scale)),Content.Load<Texture2D>("Botuni/pergament"));
 
 			start_button = new Sprite (new Rectangle ((int)(sirina / 2 - 165*scale), 0, (int)(350*scale),(int)(165*scale)),Content.Load<Texture2D> ("Botuni/oblak_start"));
-			options_button = new Sprite (new Rectangle ((int)(sirina -(270*scale)),  (int)(50*scale), (int)(250*scale),(int)(130*scale)),Content.Load<Texture2D> ("Botuni/options_oblak"));
+
+
+			credits_button = new Sprite (new Rectangle ((int)(sirina -(270*scale)),  (int)(visina - (visina / 3.7f)), (int)(150*scale),(int)(80*scale)),Content.Load<Texture2D> ("Botuni/credits button"));
+			ultra_hard_mode = new BoolButton (new Rectangle ((int)(sirina -(240*scale)),  (int)(50*scale), (int)(250*scale),(int)(130*scale)),
+				Content.Load<Texture2D> ("Botuni/TV_jojstick"), Content.Load<Texture2D> ("Botuni/TV_arrow"), ultra_hard);
+
+
+
+
 			shop_button = new Sprite (new Rectangle ((int)(20*scale), (int)(50*scale), (int)(250*scale),(int)(130*scale)),Content.Load<Texture2D> ("Botuni/shop_oblak"));
 
 			game_over = new Sprite (new Rectangle (-visina, 0, (int)(300*scale), (int)(409*scale)),Content.Load<Texture2D>("game_over"));
 			repeat_button = new Sprite (new Rectangle ((int)(sirina - (120 * scale)),(int)(visina - (visina / 4.5f) - 80 * scale),  (int)(60 * scale), (int)(80 * scale)), Content.Load<Texture2D> ("Botuni/repeat_jaje"));
 			back_button = new Sprite (new Rectangle ((int)(60 * scale),(int)(visina - (visina / 4.5f) - 80 * scale),  (int)(60 * scale), (int)(80 * scale)), Content.Load<Texture2D> ("Botuni/nazad_jaje"));
-			mute_button = new MuteBotun (new Rectangle ((int)(30 * scale), (int)(visina - (visina / 4.5f)), (int)(45 * scale), (int)(55 * scale)),
+			mute_button = new BoolButton (new Rectangle ((int)(30 * scale), (int)(visina - (visina / 4.5f)), (int)(45 * scale), (int)(55 * scale)),
 										Content.Load<Texture2D> ("Botuni/mute_on"), Content.Load<Texture2D> ("Botuni/mute_off"), mute_on);
 			
+			music_button = new BoolButton (new Rectangle ((int)(90 * scale), (int)(visina - (visina / 4.5f)), (int)(45 * scale), (int)(55 * scale)),
+				Content.Load<Texture2D> ("Botuni/pisma_off"), Content.Load<Texture2D> ("Botuni/pisma_on"), music_on);
 			
-
 
 
 
@@ -408,6 +473,8 @@ namespace Tica_Android_2
 			{	
 
 			case GameState.Start:
+				
+
 				game_shop.ispis_brojeva.Update (racun);
 				rezultat.Update (high_score);
 				touchCollection = TouchPanel.GetState ();
@@ -417,25 +484,55 @@ namespace Tica_Android_2
 					if ((tl.State == TouchLocationState.Pressed) || (tl.State == TouchLocationState.Moved)) {
 						pozicija_dodira = new Rectangle ((int)tl.Position.X, (int)tl.Position.Y, 1, 1);
 
-						if (tl.State == TouchLocationState.Pressed && start_button.rectangle.Intersects (pozicija_dodira))
+						if (tl.State == TouchLocationState.Pressed && start_button.rectangle.Intersects (pozicija_dodira)) {
+							if (!mute_on)
+								click.Play ();
 							currentGameState = GameState.Ready;
-						if (tl.State == TouchLocationState.Pressed && options_button.rectangle.Intersects (pozicija_dodira))
-							currentGameState = GameState.Options;
-						if (tl.State == TouchLocationState.Pressed && shop_button.rectangle.Intersects (pozicija_dodira))
+						}
+						if (tl.State == TouchLocationState.Pressed && credits_button.rectangle.Intersects (pozicija_dodira)) {
+							if (!mute_on)
+								click.Play ();
+							currentGameState = GameState.Credits;
+						}
+						if (tl.State == TouchLocationState.Pressed && shop_button.rectangle.Intersects (pozicija_dodira)) {
+							if (!mute_on)
+								click.Play ();
 							currentGameState = GameState.Shop;
+						}
 						if (tl.State == TouchLocationState.Pressed && mute_button.rectangle.Intersects (pozicija_dodira)) {
 							mute_on = !mute_on;
 						}
+						if (tl.State == TouchLocationState.Pressed && ultra_hard_mode.rectangle.Intersects (pozicija_dodira)) {
+							if (!mute_on)
+								click.Play ();
+							ultra_hard = !ultra_hard;
+							ultra_hard_mode.Update (ultra_hard);
+						}
+						if (tl.State == TouchLocationState.Pressed && music_button.rectangle.Intersects (pozicija_dodira)) {
+							music_on = !music_on;
+						}
 					}
 				}
+
+
+					
+					
 
 				if (mute_on)
 					mute_button.selected_tex = mute_button.texture;
 				else
 					mute_button.selected_tex = mute_button.mute_off_tex;
+				if (music_on)
+					music_button.selected_tex = music_button.texture;
+				else
+					music_button.selected_tex = music_button.mute_off_tex;
+				if (ultra_hard)
+					ultra_hard_mode.selected_tex = ultra_hard_mode.texture;
+				else
+					ultra_hard_mode.selected_tex = ultra_hard_mode.mute_off_tex;
 				break;
 
-			case GameState.Options:
+			case GameState.Credits:
 				touchCollection = TouchPanel.GetState ();
 				foreach (TouchLocation tl in touchCollection) {
 					if ((tl.State == TouchLocationState.Pressed) || (tl.State == TouchLocationState.Moved)) {
@@ -448,15 +545,18 @@ namespace Tica_Android_2
 				break;
 
 			case GameState.Shop:
+				
 				touchCollection = TouchPanel.GetState ();
 				foreach (TouchLocation tl in touchCollection) {
 					if ((tl.State == TouchLocationState.Pressed) || (tl.State == TouchLocationState.Moved)) {
 						pozicija_dodira = new Rectangle ((int)tl.Position.X, (int)tl.Position.Y, 1, 1);
 						if (tl.State == TouchLocationState.Pressed)
 						{
-							game_shop.Update (player1, pozicija_dodira, ref selected_bird, ref racun, ref unlocked_birds);
+							game_shop.Update (player1, pozicija_dodira, ref selected_bird, ref racun, ref unlocked_birds,mute_on);
 							if (back_button.rectangle.Intersects (pozicija_dodira)) 
 							{
+								if (!mute_on)
+									click.Play ();
 								Save ();
 								currentGameState = GameState.Start;
 							}
@@ -468,24 +568,43 @@ namespace Tica_Android_2
 
 			case GameState.Ready:
 				if (!upaljena_pisma_igre) {
-					if (!mute_on)
+					if (!music_on && !mute_on) {
 						MediaPlayer.Play (pjesma_igre);
-					MediaPlayer.Pause ();
-					upaljena_pisma_igre = true;
-					MediaPlayer.IsRepeating = true;
+						MediaPlayer.Pause ();
+						upaljena_pisma_igre = true;
+						MediaPlayer.IsRepeating = true;
+					}
+
 				}
-				tourt.Update (gameTime);
+				if(!ultra_hard)
+					tourt.Update (gameTime);
 				touchCollection = TouchPanel.GetState ();
 				foreach (TouchLocation tl in touchCollection) {
 					if ((tl.State == TouchLocationState.Pressed) || (tl.State == TouchLocationState.Moved)) {
-						if (tl.State == TouchLocationState.Pressed)
+						if (tl.State == TouchLocationState.Pressed) {
 							currentGameState = GameState.InGame;
+							player1.sat.Start ();
+						}
 					}
 				}
 				break;
 
 
 			case GameState.InGame:
+
+				if (Math.Abs (player1.colision_rect.Center.Y - camp_position) > 60 * scale) {
+					camp_position = player1.colision_rect.Center.Y;
+					camp_timer.Restart ();
+					camping = false;
+
+				} else {
+					if (camp_timer.ElapsedMilliseconds > 4000 && camp_timer.ElapsedMilliseconds < 5500)
+						camping = true;
+					else
+						camping = false;
+
+				}
+
 
 				// Pozadina*********************************************************************
 				if (upaljena_pisma_igre == true) {
@@ -522,12 +641,12 @@ namespace Tica_Android_2
 				rezultat.Update (player1.score);
 				CoinWizz.Update ();
 				stit.Update (player1, (int)(350*scale), lvlUp,scale);
-				player1.Update (gameTime, visina, sirina,scale);
+				player1.Update (gameTime, visina, sirina,scale,joj,ultra_hard);
 
-				maca2.Update (player1, ref udaljenost_barijera, visina, sirina * 3, red_prepreka,scale,stit_out,test_lista_coina);
-				maca.Update (player1, ref udaljenost_barijera, visina, sirina * 3, red_prepreka,scale,stit_out,test_lista_coina);
+				maca2.Update (player1, ref udaljenost_barijera, visina, sirina * 3, red_prepreka,scale,stit_out,test_lista_coina,camping);
+				maca.Update (player1, ref udaljenost_barijera, visina, sirina * 3, red_prepreka,scale,stit_out,test_lista_coina,camping);
 
-				pila.Update (player1, ref udaljenost_barijera, visina, sirina * 3, red_prepreka,scale,stit_out,test_lista_coina);
+				pila.Update (player1, ref udaljenost_barijera, visina, sirina * 3, red_prepreka,scale,stit_out,test_lista_coina,camping);
 				rotacija_pile += 0.1f;
 				if (rotacija_pile > 10)
 					rotacija_pile = 0;
@@ -535,10 +654,10 @@ namespace Tica_Android_2
 				//triba uštimat s velicinom sprite-a
 				///////////////////////////////////////
 
-				barijera.Update (player1,ref udaljenost_barijera, visina, sirina,red_prepreka,scale,stit_out,test_lista_coina);
-				barijera1.Update (player1,ref udaljenost_barijera,  visina, sirina,red_prepreka,scale,stit_out,test_lista_coina);
-				barijera2.Update (player1,ref udaljenost_barijera,  visina, sirina,red_prepreka,scale,stit_out,test_lista_coina);
-				barijera3.Update (player1,ref udaljenost_barijera,  visina, sirina,red_prepreka,scale,stit_out,test_lista_coina);
+				barijera.Update (player1,ref udaljenost_barijera, visina, sirina,red_prepreka,scale,stit_out,test_lista_coina,camping);
+				barijera1.Update (player1,ref udaljenost_barijera,  visina, sirina,red_prepreka,scale,stit_out,test_lista_coina,camping);
+				barijera2.Update (player1,ref udaljenost_barijera,  visina, sirina,red_prepreka,scale,stit_out,test_lista_coina,camping);
+				barijera3.Update (player1,ref udaljenost_barijera,  visina, sirina,red_prepreka,scale,stit_out,test_lista_coina,camping);
 				lvlUp.Update (player1, (int)(300*scale), ref udaljenost_barijera, scale);
 
 				if (sljedeciLevel == lvlUp.level)
@@ -575,7 +694,7 @@ namespace Tica_Android_2
 						bar.rectangle.Y -= (int)(10 * scale);
 				}
 
-				player1.Update (gameTime, graphics.PreferredBackBufferHeight, graphics.PreferredBackBufferWidth, scale);
+				player1.Update (gameTime, graphics.PreferredBackBufferHeight, graphics.PreferredBackBufferWidth, scale,joj,ultra_hard);
 
 				
 
@@ -599,6 +718,8 @@ namespace Tica_Android_2
 					 else {
 						Save ();
 						add_counter+=2;
+						ultra_hard_mode.rectangle.X = (sirina);
+						ultra_hard_mode.rectangle.Y = (-ultra_hard_mode.rectangle.Height);
 						currentGameState = GameState.Score_show;
 					}
 				}
@@ -617,6 +738,8 @@ namespace Tica_Android_2
 						if (tl.State == TouchLocationState.Pressed && back_button.rectangle.Intersects (pozicija_dodira))
 						{
 							MediaPlayer.Stop ();
+							if (!mute_on)
+								click.Play ();
 							Initialize ();
 							currentGameState = GameState.Start;
 						}
@@ -627,6 +750,21 @@ namespace Tica_Android_2
 
 			case GameState.Score_show:
 				
+				uhm_udaljenostX = (int)Math.Abs( (sirina -(448*scale) - ultra_hard_mode.rectangle.X) * scrolling1.brzina_kretanja);
+				uhm_udaljenostY= (int)Math.Abs( ((265*scale) - ultra_hard_mode.rectangle.Y) * scrolling1.brzina_kretanja);
+
+
+
+				if (ultra_hard_mode.rectangle.X > (sirina -(448*scale)-ultra_hard_mode.rectangle.Width))
+					ultra_hard_mode.rectangle.X -= (int)(uhm_udaljenostX / 40);
+					if (ultra_hard_mode.rectangle.Y < (265*scale)- ultra_hard_mode.rectangle.Height)
+					ultra_hard_mode.rectangle.Y += (int)(uhm_udaljenostX / 40);
+
+				if (ultra_hard)
+					ultra_hard_mode.selected_tex = cntrl_jstck;
+				else
+					ultra_hard_mode.selected_tex = cntrl_arrow;
+
 				if (add_counter >= 5) {
 					
 					add_counter = -1;
@@ -637,15 +775,12 @@ namespace Tica_Android_2
 
 					FinalAd.CustomBuild ();
 				}
-
-
-					
+								
 
 				if ((int)sat.Elapsed.Seconds < 4 && add_counter == -1)
 					game_shop.ispis_brojeva.Update (4 - (int)(sat.Elapsed.Seconds));
-				
-
-				player1.Update (gameTime, visina, sirina, scale);
+		
+				player1.Update (gameTime, visina, sirina, scale,joj,ultra_hard);
 				rezultat.Update (player1.score);
 
 				touchCollection = TouchPanel.GetState ();
@@ -655,8 +790,10 @@ namespace Tica_Android_2
 					if (support_scroll.rectangle.Y < (visina / 2 - (int)(support_scroll.rectangle.Height * 3/ 5)))
 						support_scroll.rectangle.Y += (int)(10 * scale);
 				}
-				else {
-					if (Score_scroll.rectangle.Y < (visina / 2 - (int)(Score_scroll.rectangle.Height * 3 / 4)))
+				else {//dodat controls.change
+
+
+					if (Score_scroll.rectangle.Y < (visina / 2 - (int)(Score_scroll.rectangle.Height * 5 / 6)))
 						Score_scroll.rectangle.Y += (int)(15 * scale);
 					OWizz.Update (scale);
 				}
@@ -668,13 +805,33 @@ namespace Tica_Android_2
 						pozicija_dodira = new Rectangle ((int)tl.Position.X, (int)tl.Position.Y, 1, 1);
 
 						if (tl.State == TouchLocationState.Pressed && repeat_button.rectangle.Intersects (pozicija_dodira ) && (sat.Elapsed.Seconds>3 || add_counter!=-1)) {
+							if (!mute_on)
+								click.Play ();
+							Save ();
 							Initialize ();
 							OWizz.Clear ();
 							currentGameState = GameState.Ready;
+							ultra_hard_mode.rectangle.X = (int)(sirina - (240 * scale));
+							ultra_hard_mode.rectangle.Y = (int)(50 * scale);
 						}
 						if (tl.State == TouchLocationState.Pressed && back_button.rectangle.Intersects (pozicija_dodira)) {
+							if (!mute_on)
+								click.Play ();
 							OWizz.Clear ();
+							ultra_hard_mode.rectangle.X = (int)(sirina - (240 * scale));
+							ultra_hard_mode.rectangle.Y = (int)(50 * scale);
+							Save ();
 							Initialize ();
+
+						}
+
+						if (tl.State == TouchLocationState.Pressed && ultra_hard_mode.rectangle.Intersects (pozicija_dodira)) {
+							ultra_hard = !ultra_hard;
+							if (!mute_on) 
+								click.Play ();
+							
+							
+
 
 						}
 					}
@@ -698,27 +855,31 @@ namespace Tica_Android_2
 
 				scrolling1.Draw (spriteBatch);
 				scrolling2.Draw (spriteBatch);
-				spriteBatch.Draw (options_button.texture, options_button.rectangle, Color.White);
+				spriteBatch.Draw (credits_button.texture, credits_button.rectangle, Color.White);
 				spriteBatch.Draw (shop_button.texture, shop_button.rectangle, Color.White);
 				spriteBatch.Draw (start_button.texture, start_button.rectangle, Color.White);
 				mute_button.Draw (spriteBatch);
+				ultra_hard_mode.Draw (spriteBatch);
+				music_button.Draw (spriteBatch);
 
-				spriteBatch.Draw(kruna,new Rectangle((sirina/2),((visina-visina/3)-(int)(65*scale)),(int)(90*scale),(int)(60*scale)),Color.White);
+
+				spriteBatch.Draw(tabla_hs,new Rectangle((int)(sirina/2.65f),(visina-visina/3)-(int)(120*scale),(int)(240*scale),(int)(230*scale)),Color.White);
+				spriteBatch.Draw(kruna,new Rectangle((int)(sirina/2.1f),((visina-visina/3)-(int)(160*scale)),(int)(90*scale),(int)(60*scale)),Color.White);
 				try{
-					rezultat.Draw (spriteBatch, sirina/2,visina-visina/3,(int)(30*scale), (int)(80*scale));
-
+					rezultat.Draw (spriteBatch, (int)(sirina/2.3f),(visina-visina/3)-(int)(60*scale),(int)(30*scale), (int)(60*scale));
 				}
 				catch{}
 				spriteBatch.End ();
 
 				break;
 
-			case GameState.Options:
+			case GameState.Credits:
 				spriteBatch.Begin (SpriteSortMode.Deferred, BlendState.NonPremultiplied);
 
 				scrolling1.Draw (spriteBatch);
 				scrolling2.Draw (spriteBatch);
 
+				spriteBatch.Draw (Credits_Table.texture, Credits_Table.rectangle, Color.White);
 				spriteBatch.Draw (back_button.texture, back_button.rectangle, Color.White);
 				spriteBatch.Draw(Score_scroll.texture, Score_scroll.rectangle,Color.White);
 				spriteBatch.End ();
@@ -743,12 +904,23 @@ namespace Tica_Android_2
 				scrolling1.Draw (spriteBatch);
 				scrolling2.Draw (spriteBatch);
 
-				spriteBatch.Draw(turtorial_tex,new Rectangle(player1.colision_rect.X+player1.colision_rect.Width-(visina-(int)(visina/4.35f))/2,player1.colision_rect.Y+player1.colision_rect.Height-(visina-(int)(visina/4.35f))/2,(visina-(int)(visina/4.35f)),(visina-(int)(visina/4.35f))),Color.White);
-				try{
-					rezultat.Draw (spriteBatch, 5, 5, (int)(15*scale), (int)(40*scale));
+				try {
+					rezultat.Draw (spriteBatch, 5, 5, (int)(15 * scale), (int)(40 * scale));
+				} catch {
 				}
-				catch{}
-				tourt.Draw (spriteBatch);
+
+				if (!ultra_hard) {
+					spriteBatch.Draw (turtorial_tex, new Rectangle (player1.colision_rect.X + player1.colision_rect.Width - (visina - (int)(visina / 4.35f)) / 2, player1.colision_rect.Y + player1.colision_rect.Height - (visina - (int)(visina / 4.35f)) / 2, (visina - (int)(visina / 4.35f)), (visina - (int)(visina / 4.35f))), Color.White);
+					tourt.Draw (spriteBatch);
+				}
+				else{
+					spriteBatch.Draw (
+						player_textura
+						, new Vector2(player1.rectangle.X+(scale*player1.playerAnimation.FrameWith/2),player1.rectangle.Y+(scale*player1.playerAnimation.FrameHeight/2))
+						, player1.playerAnimation.suorceRect, Color.White, 0, player1.playerAnimation.origin,scale*0.96f, SpriteEffects.None, 0
+					);
+					joj.Draw (spriteBatch);
+				}
 
 				spriteBatch.End ();
 
@@ -764,6 +936,8 @@ namespace Tica_Android_2
 					spriteBatch.Begin (SpriteSortMode.Deferred, BlendState.NonPremultiplied);
 					scrolling1.Draw (spriteBatch);
 					scrolling2.Draw (spriteBatch);
+					if(ultra_hard && joj.postavljen)
+						joj.Draw (spriteBatch);
 					hint.Draw (spriteBatch);
 					foreach (Coin x in test_lista_coina) 
 					{
@@ -846,10 +1020,12 @@ namespace Tica_Android_2
 				if (add_counter == -1) {
 					if (sat.Elapsed.Seconds < 4)
 						game_shop.ispis_brojeva.Draw (spriteBatch, (int)(sirina - (90 * scale)), (int)(visina - (visina / 4.5f) - 85 * scale), (int)(25 * scale), (int)(40 * scale));
-					rezultat.Draw (spriteBatch, support_scroll.rectangle.Center.X-(int)((player1.score.ToString().Length)*20*scale),support_scroll.rectangle.Y+(int)(250*scale),(int)(25*scale), (int)(40*scale));
+					rezultat.Draw (spriteBatch,Score_scroll.rectangle.Center.X-(int)((player1.score.ToString().Length)*20*scale) ,support_scroll.rectangle.Y+(int)(250*scale),(int)(25*scale), (int)(40*scale));
 				}
+				else
+					ultra_hard_mode.Draw (spriteBatch);
 				try{
-					rezultat.Draw (spriteBatch, Score_scroll.rectangle.Center.X-(int)((player1.score.ToString().Length)*20*scale),Score_scroll.rectangle.Center.Y,(int)(30*scale), (int)(50*scale));
+					rezultat.Draw (spriteBatch, (int)(support_scroll.rectangle.Center.X/1.25f-(player1.score.ToString().Length)*20*scale),Score_scroll.rectangle.Center.Y-(int)(20*scale),(int)(30*scale), (int)(50*scale));
 				}
 				catch{}
 
