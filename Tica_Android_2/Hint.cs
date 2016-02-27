@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework.Audio;
 using System.Diagnostics;
 using Microsoft.Xna.Framework.Content;
-using Android.Gms.Games;
+//using Android.Gms.Games;
 
 namespace Tica_Android_2
 {

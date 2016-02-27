@@ -1,17 +1,21 @@
 ﻿<Properties StartupItem="Tica_Android_2\Tica_Android_2.csproj">
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Android.480x800_hdpi_3.7inch" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Tica_Android_2\Shop.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release" PreferredExecutionTarget="Android.YT91116GD2" />
+  <MonoDevelop.Ide.Workbench>
     <Files>
-      <File FileName="Tica_Android_2\Background.cs" Line="1" Column="1" />
-      <File FileName="Tica_Android_2\Game1.cs" Line="1" Column="1" />
+      <File FileName="Tica_Android_2\Background.cs" Line="69" Column="14" />
+      <File FileName="Tica_Android_2\Game1.cs" Line="679" Column="13" />
       <File FileName="Tica_Android_2\Barijera.cs" Line="1" Column="1" />
       <File FileName="Tica_Android_2\BoolButton.cs" Line="1" Column="1" />
       <File FileName="Tica_Android_2\Coin.cs" Line="1" Column="1" />
       <File FileName="Tica_Android_2\CoinWizzard.cs" Line="1" Column="1" />
       <File FileName="Tica_Android_2\HealthBar.cs" Line="1" Column="1" />
-      <File FileName="Tica_Android_2\Shop.cs" Line="31" Column="1" />
+      <File FileName="Tica_Android_2\Shop.cs" Line="1" Column="1" />
       <File FileName="Tica_Android_2\HS_podium.cs" Line="1" Column="1" />
       <File FileName="Tica_Android_2\Jojstick.cs" Line="1" Column="1" />
+      <File FileName="packages\Xamarin.GooglePlayServices.27.0.0.0\readme.txt" Line="1" Column="1" />
+      <File FileName="Tica_Android_2\Hint.cs" Line="1" Column="1" />
+      <File FileName="Tica_Android_2\Oblak_Wizzard.cs" Line="1" Column="1" />
+      <File FileName="..\Program Files (x86)\MSBuild\Xamarin\Android\Xamarin.Android.Common.targets" Line="882" Column="35" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
